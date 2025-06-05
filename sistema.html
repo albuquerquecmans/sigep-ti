@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEP-TI - Protótipo HTML</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            padding: 2rem;
+            box-sizing: border-box;
+            display: flex; /* Para centralizar o login */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%; /* Garante que o container ocupe a largura disponível */
+        }
+        .header {
+            background-color: #1a365d; /* Dark blue */
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            display: flex; /* Para alinhar título e botão de sair */
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+        }
+        .header h1, .header p {
+            margin: 0;
+            padding: 0;
+            text-align: left; /* Alinha o texto do cabeçalho à esquerda */
+        }
+        .header .logout-button {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            margin-left: auto; /* Empurra o botão para a direita */
+        }
+        .header .logout-button:hover {
+            background-color: #dc2626;
+        }
+
+        .section-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            font-size: 1.75rem; /* text-2xl */
+            font-weight: 700;
+            color: #2d3748; /* Dark gray */
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e2e8f0; /* Light gray border */
+            padding-bottom: 0.5rem;
+        }
+        .subsection-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600;
+            color: #2c5282; /* Blue */
+            margin-bottom: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background-color: #edf2f7; /* Lighter gray for table header */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        tbody tr:hover {
+            background-color: #f7fafc; /* Lighter hover */
+        }
+        .status-select, .indicator-input, .text-input, .add-action-input, .form-field-input {
+            border: 1px solid #cbd5e0;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            width: 100%;
+        }
+        .status-select {
+            background-color: white;
+        }
+        .action-button {
+            background-color: #4a90e2;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+        .action-button:hover {
+            background-color: #357ABD;
+        }
+        .delete-button {
+            background-color: #ef4444; /* Red */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            margin-left: 0.5rem;
+        }
+        .delete-button:hover {
+            background-color: #dc2626;
+        }
+        .add-action-form, #indicator-data-form-modal {
+            background-color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 1.5rem;
+            border: 1px dashed #cbd5e0;
+            display: none; /* Hidden by default */
+            position: fixed; /* Fixed position for overlay */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            z-index: 1001;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow-y: auto; /* Enable scrolling for long forms */
+            max-height: 90vh; /* Limit height */
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Default to single column */
+            gap: 1rem;
+        }
+        @media (min-width: 640px) { /* sm breakpoint */
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr); /* Two columns on larger screens */
+            }
+        }
+        .form-full-width {
+            grid-column: 1 / -1; /* Occupy full width */
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Login Screen Styles */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .login-card {
+            background-color: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        .login-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .login-button {
+            background-color: #1a365d;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            width: 100%;
+            font-size: 1.125rem;
+        }
+        .login-button:hover {
+            background-color: #2c5282;
+        }
+        #main-content {
+            display: none; /* Hidden by default, shown after login */
+        }
+        .org-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #e2e8f0;
+        }
+        .org-group-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.75rem;
+        }
+        .org-card {
+            padding: 1rem;
+            background-color: #d1e7dd; /* Light green for org cards */
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+        .org-card:hover {
+            transform: translateY(-3px);
+            background-color: #c0e0cc;
+        }
+        .org-card h4 {
+            font-weight: 600;
+            color: #155724; /* Dark green */
+        }
+        .org-card p {
+            font-size: 0.875rem;
+            color: #155724;
+        }
+
+        /* Flow Diagram Styles */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f7fafc;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .flow-step {
+            background-color: #e0f2fe;
+            border: 1px solid #90cdf4;
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .flow-step-title {
+            font-weight: 700;
+            color: #2c5282;
+            margin-bottom: 0.5rem;
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #4a5568;
+            line-height: 1;
+        }
+        .flow-info {
+            font-size: 0.875rem;
+            color: #4a5568;
+            margin-top: 0.5rem;
+        }
+
+        /* Tab Navigation Styles */
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background-color: #ffffff;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+        }
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+            background-color: transparent;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            color: #2c5282;
+            background-color: #edf2f7;
+        }
+        .tab-button.active {
+            color: #1a365d;
+            background-color: #e0e7ff;
+            border-color: #a7b7ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        .tab-content-section {
+            display: none; /* Hidden by default */
+        }
+        .tab-content-section.active {
+            display: block; /* Shown when active */
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Chosen Palette: Warm Neutrals with Blue/Green/Red Accents -->
+    <!-- Application Structure Plan: The SPA is designed with a multi-screen approach, starting with a login screen for access control. Upon successful login, the user enters the main application, which features a tabbed navigation system. This system organizes content into logical "screens" or "functions": "Visão Geral do Plano" (providing textual context), "Coleta de Informações dos Órgãos" (allowing data submission based on agency responsibility), "Fluxo de Informações Chave" (a new visual representation of a critical process), and "Gerenciamento dos Eixos de Ação" (for detailed action/indicator management). This structure facilitates a clear user flow, easy navigation between distinct functionalities, and progressive disclosure of information, preventing cognitive overload and ensuring targeted interaction based on user needs. -->
+    <!-- Visualization & Content Choices:
+    - Plano de Ação: Textual content (P/H tags) - Goal: Inform - Presents static background and context.
+    - Coleta de Informações dos Órgãos: Org cards with onclick alerts and dynamic modal forms (HTML/CSS/JS) - Goal: Organize, Collect - Provides interactive entry points for data submission, tailored by agency responsibility. Form fields are dynamically generated based on indicator data.
+    - Fluxo de Informações Chave: Step-by-step diagram (HTML/CSS/JS) - Goal: Explain Process - Visualizes complex multi-agency workflow (IBAMA -> PF -> COAF) for illegal timber, enhancing understanding of interconnections.
+    - Gerenciamento dos Eixos de Ação: Interactive table (HTML/CSS/JS) - Goal: Manage, Track, Update - Allows inline editing of action status, indicator values, and adding/deleting actions, providing a dynamic overview of plan progress.
+    - Login/Logout: Simple form/button (HTML/CSS/JS) - Goal: Access Control - Basic authentication simulation.
+    - Overall: Tailwind CSS for layout and styling (responsiveness), Vanilla JavaScript for all interactions and dynamic content updates. No external charting libraries are used in this version.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Login SIGEP-TI</h2>
+            <input type="text" id="username" class="login-input" placeholder="Usuário" value="mpi_admin">
+            <input type="password" id="password" class="login-input" placeholder="Senha" value="senha123">
+            <button id="login-button" class="login-button">Entrar</button>
+            <p id="login-message" class="text-red-500 mt-4 hidden">Usuário ou senha incorretos.</p>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until login) -->
+    <div id="main-content" class="container">
+        <header class="header">
+            <div>
+                <h1 class="text-3xl font-bold">SIGEP-TI: Gerenciamento do Plano de Ação</h1>
+                <p class="mt-1 text-lg">Sistema Integrado de Gestão e Estrangulamento da Exploração em Terras Indígenas</p>
+                <p class="mt-4 text-sm text-red-300">
+                    **PROTÓTIPO ESTÁTICO: As alterações feitas nesta página NÃO serão salvas.**
+                    Ao recarregar ou fechar o navegador, os dados retornarão ao estado inicial.
+                </p>
+            </div>
+            <button id="logout-button" class="logout-button">Sair</button>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-button active" data-tab="visao-geral">Visão Geral do Plano</button>
+            <button class="tab-button" data-tab="coleta-informacoes">Coleta de Informações dos Órgãos</button>
+            <button class="tab-button" data-tab="fluxo-informacoes">Fluxo de Informações Chave</button>
+            <button class="tab-button" data-tab="gerenciamento-acoes">Gerenciamento dos Eixos de Ação</button>
+        </nav>
+
+        <!-- Tab Content: Visão Geral do Plano -->
+        <section id="visao-geral" class="section-card tab-content-section active">
+            <h2 class="section-title">Plano de Ação: Visão Geral</h2>
+            <div class="text-gray-700 leading-relaxed space-y-4">
+                <h3 class="subsection-title text-blue-700">APRESENTAÇÃO</h3>
+                <p>Este Plano de Ação Intersetorial detalha uma estratégia governamental coordenada para o estrangulamento operacional e financeiro de organizações criminosas envolvidas em garimpo ilegal, extração ilegal de madeira e agropecuária não autorizada, com foco prioritário nas Terras Indígenas (TIs). Elaborado a partir de um diagnóstico aprofundado da problemática e da análise das capacidades institucionais existentes, o plano foi construído com a premissa de uma atuação multissetorial e transversal, visando descapitalizar esses grupos, dificultar a lavagem de dinheiro e restringir seu acesso a recursos.</p>
+                <p>O plano destaca o Ministério dos Povos Indígenas (MPI) como órgão protagonista, dada a alta incidência desses ilícitos em territórios indígenas e a necessidade de uma abordagem culturalmente sensível e territorialmente adequada. A Advocacia-Geral da União (AGU) emerge como um ator jurídico essencial, garantindo a efetividade das ações judiciais e extrajudiciais de recuperação de ativos e aplicação de sanções. A colaboração interinstitucional é o pilar central, buscando transformar a resposta emergencial em uma política de Estado contínua e eficaz. Brasília, junho de 2025.</p>
+
+                <h3 class="subsection-title text-blue-700 mt-8">01 Introdução</h3>
+                <p class="text-gray-600 italic">Contextualização histórica, espacial e situacional e apresentação da problemática.</p>
+                <p>A problemática dos crimes ambientais no Brasil, em especial o garimpo ilegal, a extração ilegal de madeira e a agropecuária não autorizada, atingiu níveis críticos, com impactos devastadores sobre os ecossistemas, a biodiversidade e as populações tradicionais, como demonstrado pela crise humanitária e ambiental na Terra Indígena Yanomami. Essas atividades ilícitas são frequentemente orquestradas por organizações criminosas complexas, que utilizam mecanismos sofisticados de lavagem de dinheiro e corrupção para financiar suas operações e legitimar seus ganhos.</p>
+                <p>Historicamente, o combate a esses crimes concentrou-se em ações de fiscalização e apreensão no campo. Contudo, a experiência tem demonstrado que, para desmantelar efetivamente essas redes, é imperativo atacar sua base econômica. O presente plano surge nesse contexto, propondo uma mudança de paradigma para uma estratégia de estrangulamento financeiro, visando cortar o fluxo de recursos que alimenta essas atividades criminosas.</p>
+            </div>
+        </section>
+
+        <!-- Tab Content: Coleta de Informações dos Órgãos -->
+        <section id="coleta-informacoes" class="section-card tab-content-section">
+            <h2 class="section-title">Coleta de Informações dos Órgãos da Rede</h2>
+            <p class="text-gray-700 mb-6">Clique no órgão para abrir o formulário de submissão de dados específicos dos indicadores de sua responsabilidade.</p>
+            
+            <div class="org-group">
+                <h3 class="org-group-title">Eixo: Jurídico e Aplicação da Lei</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="org-card" onclick="showIndicatorForm('AGU')">
+                        <h4>Advocacia-Geral da União (AGU)</h4>
+                        <p>Representação judicial e extrajudicial.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MJSP')">
+                        <h4>Ministério da Justiça e Segurança Pública (MJSP)</h4>
+                        <p>Investigações e operações (PF, Senad, Saju, FNSP, PRF).</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MPF')">
+                        <h4>Ministério Público Federal (MPF)</h4>
+                        <p>Fiscalização da lei e proposição de ações.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-group">
+                <h3 class="org-group-title">Eixo: Financeiro e Econômico</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="org-card" onclick="showIndicatorForm('Coaf')">
+                        <h4>Conselho de Controle de Atividades Financeiras (Coaf)</h4>
+                        <p>Inteligência financeira e prevenção à LD.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MF')">
+                        <h4>Ministério da Fazenda (MF)</h4>
+                        <p>Política econômica e fiscal (CMN).</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('BCB')">
+                        <h4>Banco Central do Brasil (BCB)</h4>
+                        <p>Regulamentação do sistema financeiro.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('BNDES')">
+                        <h4>Banco Nacional de Desenvolvimento Econômico e Social (BNDES)</h4>
+                        <p>Fomento e compliance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-group">
+                <h3 class="org-group-title">Eixo: Ambiental e Regulatório</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="org-card" onclick="showIndicatorForm('MMA')">
+                        <h4>Ministério do Meio Ambiente e Mudança do Clima (MMA)</h4>
+                        <p>Fiscalização e proteção ambiental (IBAMA, ICMBio).</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('ANM')">
+                        <h4>Agência Nacional de Mineração (ANM)</h4>
+                        <p>Regulação e fiscalização da mineração.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MAPA')">
+                        <h4>Ministério da Agricultura e Pecuária (MAPA)</h4>
+                        <p>Regulamentação e fiscalização agropecuária.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MDA')">
+                        <h4>Ministério do Desenvolvimento Agrário e Agricultura Familiar (MDA)</h4>
+                        <p>Fomento e regularização fundiária (INCRA).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-group">
+                <h3 class="org-group-title">Outros Órgãos da Rede (MPI - Protagonista)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="org-card" onclick="showIndicatorForm('MPI')">
+                        <h4>Ministério dos Povos Indígenas (MPI)</h4>
+                        <p>Protagonista e coordenador central.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MD')">
+                        <h4>Ministério da Defesa (MD)</h4>
+                        <p>Apoio logístico e de segurança (EB, Marinha, FAB).</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MPO')">
+                        <h4>Ministério do Planejamento e Orçamento (MPO)</h4>
+                        <p>Planejamento e alocação de recursos.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('Casa Civil')">
+                        <h4>Casa Civil da Presidência da República</h4>
+                        <p>Coordenação política e administrativa.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('MS')">
+                        <h4>Ministério da Saúde (MS)</h4>
+                        <p>Política nacional de saúde (Sesai).</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('Funai')">
+                        <h4>Fundação Nacional dos Povos Indígenas (Funai)</h4>
+                        <p>Proteção e promoção dos direitos indígenas.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('Conab')">
+                        <h4>Companhia Nacional de Abastecimento (Conab)</h4>
+                        <p>Política de abastecimento alimentar.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('Censipam')">
+                        <h4>Centro Gestor e Operacional do Sistema de Proteção da Amazônia (Censipam)</h4>
+                        <p>Informações e monitoramento estratégico.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('INCRA')">
+                        <h4>Instituto Nacional de Colonização e Reforma Agrária (INCRA)</h4>
+                        <p>Reforma agrária e regularização fundiária.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('IBAMA')">
+                        <h4>Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA)</h4>
+                        <p>Fiscalização ambiental.</p>
+                    </div>
+                    <div class="org-card" onclick="showIndicatorForm('ICMBio')">
+                        <h4>Instituto Chico Mendes de Conservação da Biodiversidade (ICMBio)</h4>
+                        <p>Gestão de Unidades de Conservação.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Content: Fluxo de Informações Chave -->
+        <section id="fluxo-informacoes" class="section-card tab-content-section">
+            <h2 class="section-title">Fluxo de Informações Chave: Madeira Ilegal</h2>
+            <p class="text-gray-700 mb-6">Este diagrama ilustra como a informação sobre volumes irregulares de madeira flui entre os órgãos para subsidiar o estrangulamento financeiro.</p>
+            <div class="flow-diagram">
+                <div class="flow-step bg-orange-100 border-orange-400">
+                    <div class="flow-step-title">1. Identificação da Irregularidade</div>
+                    <p class="text-sm text-gray-700">**Órgão:** IBAMA (Eixo Ambiental e Regulatório)</p>
+                    <div class="flow-info">
+                        <p>O IBAMA, através do Sinaflor e fiscalização em campo, identifica volumes de madeira extraída sem autorização ou em desacordo com o volume permitido.</p>
+                        <p class="text-xs italic mt-1">Ex: Notificação de volume irregular de madeira no Sinaflor.</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-step bg-purple-100 border-purple-400">
+                    <div class="flow-step-title">2. Inquérito e Investigação Criminal</div>
+                    <p class="text-sm text-gray-700">**Órgão:** Polícia Federal (Eixo Jurídico e Aplicação da Lei)</p>
+                    <div class="flow-info">
+                        <p>A PF recebe a informação do IBAMA e inicia um inquérito para investigar a extração ilegal de madeira, buscando identificar os responsáveis e a cadeia criminosa.</p>
+                        <p class="text-xs italic mt-1">Ex: Abertura de inquérito policial sobre crime ambiental.</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="flow-step bg-red-100 border-red-400">
+                    <div class="flow-step-title">3. Análise de Inteligência Financeira</div>
+                    <p class="text-sm text-gray-700">**Órgão:** COAF (Eixo Financeiro e Econômico)</p>
+                    <div class="flow-info">
+                        <p>A PF, ao identificar movimentações financeiras suspeitas ligadas ao inquérito, solicita um Relatório de Inteligência Financeira (RIF) ao COAF.</p>
+                        <p>O COAF analisa os dados financeiros para identificar lavagem de dinheiro, beneficiários finais e o impacto econômico da atividade ilegal.</p>
+                        <p class="text-xs italic mt-1">Ex: Geração de RIF sobre transações financeiras de empresas/indivíduos ligados à madeira ilegal.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Content: Gerenciamento dos Eixos de Ação -->
+        <section id="gerenciamento-acoes" class="section-card tab-content-section">
+            <h2 class="section-title">Gerenciamento dos Eixos de Ação</h2>
+            <div id="action-plan-management">
+                <!-- Conteúdo dos quadros de ação será renderizado aqui pelo JavaScript -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Formulário para Adicionar Nova Ação (inicialmente oculto) -->
+    <div id="add-action-form" class="add-action-form">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Adicionar Nova Ação</h3>
+        <input type="hidden" id="add-action-meta-id">
+        <div class="form-grid">
+            <div class="form-full-width">
+                <label for="new-action-description" class="block text-sm font-medium text-gray-700">Descrição da Ação</label>
+                <textarea id="new-action-description" class="add-action-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" rows="3" placeholder="Descreva a nova ação..."></textarea>
+            </div>
+            <div>
+                <label for="new-action-impact-indicator" class="block text-sm font-medium text-gray-700">Indicador de Impacto</label>
+                <input type="text" id="new-action-impact-indicator" class="add-action-input mt-1 block w-full" placeholder="Ex: Redução da opacidade...">
+            </div>
+            <div>
+                <label for="new-action-result-indicator" class="block text-sm font-medium text-gray-700">Indicador de Resultado</label>
+                <input type="text" id="new-action-result-indicator" class="add-action-input mt-1 block w-full" placeholder="Ex: Número de tipologias...">
+            </div>
+            <div>
+                <label for="new-action-deadline" class="block text-sm font-medium text-gray-700">Prazo</label>
+                <input type="text" id="new-action-deadline" class="add-action-input mt-1 block w-full" placeholder="Ex: Contínuo, 6 meses, Anual">
+            </div>
+            <div>
+                <label for="new-action-responsible" class="block text-sm font-medium text-gray-700">Responsáveis</label>
+                <input type="text" id="new-action-responsible" class="add-action-input mt-1 block w-full" placeholder="Ex: MPI, Coaf">
+            </div>
+            <div>
+                <label for="new-action-status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="new-action-status" class="add-action-input mt-1 block w-full">
+                    <option value="Pendente">Pendente</option>
+                    <option value="Em Execução">Em Execução</option>
+                    <option value="Concluído">Concluído</option>
+                    <option value="Cancelado">Cancelado</option>
+                    <option value="A Definir">A Definir</option>
+                </select>
+            </div>
+            <div>
+                <label for="new-action-indicator-value" class="block text-sm font-medium text-gray-700">Valor Indicador Inicial</label>
+                <input type="number" step="0.01" id="new-action-indicator-value" class="add-action-input mt-1 block w-full" placeholder="Ex: 10.5">
+            </div>
+            <div>
+                <label for="new-action-indicator-unit" class="block text-sm font-medium text-gray-700">Unidade Indicador</label>
+                <input type="text" id="new-action-indicator-unit" class="add-action-input mt-1 block w-full" placeholder="Ex: %, R$, agentes">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button onclick="submitAddAction()" class="action-button">Adicionar Ação</button>
+            <button onclick="cancelAddAction()" class="delete-button">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal para Formulário de Indicadores por Órgão -->
+    <div id="indicator-data-form-modal" class="add-action-form">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Reportar Indicadores para <span id="current-org-name"></span></h3>
+        <form id="indicator-report-form">
+            <div id="indicator-fields-container" class="form-grid">
+                <!-- Fields will be dynamically added here -->
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="action-button">Submeter Dados</button>
+                <button type="button" onclick="hideIndicatorForm()" class="delete-button">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Dados hardcoded para o protótipo (não persistentes)
+        let quadrosData = [
+            {
+                id: 'eixoJuridico',
+                order_num: 1,
+                title: 'Eixo: Jurídico e Aplicação da Lei',
+                context: 'Este eixo abrange as ações de representação judicial e extrajudicial, investigações, e a aplicação de sanções legais para desmantelar organizações criminosas e recuperar ativos. Principais atores: AGU, MJSP (PF, Senad, Saju, FNSP, PRF), MPF.',
+                metas: [
+                    { id: 'meta1.3', description: 'Qualificar o suporte jurídico às ações de estrangulamento financeiro.' },
+                    { id: 'meta3.2', description: 'Fortalecer a atuação da AGU na recuperação de ativos e reparação de danos.' }
+                ]
+            },
+            {
+                id: 'eixoFinanceiro',
+                order_num: 2,
+                title: 'Eixo: Financeiro e Econômico',
+                context: 'Foca na interrupção dos fluxos financeiros ilícitos, prevenção à lavagem de dinheiro, recuperação de ativos e restrição de crédito. Principais atores: MF (CMN), BCB, Coaf, BNDES.',
+                metas: [
+                    { id: 'meta1.1', description: 'Aprimorar a detecção de transações financeiras suspeitas relacionadas a crimes ambientais.' },
+                    { id: 'meta2.1', description: 'Aumentar a expertise em investigação financeira de crimes ambientais.' },
+                    { id: 'meta2.2', description: 'Qualificar a gestão e destinação de ativos apreendidos.' },
+                    { id: 'meta2.3', description: 'Capacitar equipes para aplicação de normas de crédito rural e fiscalização agropecuária.' },
+                    { id: 'meta3.3', description: 'Assegurar a aplicação do PL do Ouro e restrições de crédito rural.' }
+                ]
+            },
+            {
+                id: 'eixoAmbiental',
+                order_num: 3,
+                title: 'Eixo: Ambiental e Regulatório',
+                context: 'Concentra-se na fiscalização ambiental, regulamentação de atividades extrativistas e agropecuárias, e uso de tecnologias para monitoramento. Principais atores: MMA (IBAMA, ICMBio), MAPA, MDA (INCRA), ANM.',
+                metas: [
+                    { id: 'meta1.2', description: 'Fortalecer a capacidade de análise de dados e geointeligência.' }
+                ]
+            }
+        ];
+
+        let actionsData = [
+            // Eixo Jurídico e Aplicação da Lei
+            { id: 'action1.3.A', meta_id: 'meta1.3', description: 'AGU e MPI desenvolverem manuais e treinamentos sobre procedimentos jurídicos para perdimento de bens e cobrança de multas.', impact_indicator: 'Redução de contestações e aumento da efetividade das ações jurídicas.', result_indicator: 'Número de manuais e treinamentos realizados.', deadline: 'Curto Prazo', responsible: 'AGU, MPI', status: 'Prevista', indicator_value_current: 1, indicator_unit: 'manual' },
+            { id: 'action3.2.A', meta_id: 'meta3.2', description: 'AGU e MPI estabelecerem um fluxo prioritário para o acionamento judicial em casos de crimes ambientais em TIs, incluindo ações de perdimento de bens e reparação de danos.', impact_indicator: 'Aumento da efetividade da recuperação de ativos e da responsabilização financeira.', result_indicator: 'Número de ações judiciais de perdimento/reparação iniciadas pela AGU em TIs.', deadline: 'Contínuo', responsible: 'AGU, MPI', status: 'Em Execução', indicator_value_current: 5, indicator_unit: 'ações' },
+
+            // Eixo Financeiro e Econômico
+            { id: 'action1.1.A', meta_id: 'meta1.1', description: 'Desenvolver e disseminar novas tipologias de lavagem de dinheiro específicas para garimpo ilegal, extração ilegal de madeira e agropecuária não autorizada.', impact_indicator: 'Redução da opacidade das transações financeiras ilícitas.', result_indicator: 'Número de novas tipologias.', deadline: 'Contínuo', responsible: 'Coaf, PF, BCB, MPI', status: 'Em Execução', indicator_value_current: 2, indicator_unit: 'tipologias' },
+            { id: 'action1.1.B', meta_id: 'meta1.1', description: 'Fortalecer a capacidade de análise de dados do Coaf e da PF, com uso de ferramentas de big data e IA.', impact_indicator: 'Aumento da taxa de identificação de operações suspeitas.', result_indicator: 'Número de RIFs gerados com base em análises avançadas.', deadline: 'Médio Prazo', responsible: 'Coaf, PF', status: 'Prevista', indicator_value_current: null, indicator_unit: '' },
+            { id: 'action2.1.A', meta_id: 'meta2.1', description: 'MJSP (PF), Coaf e MPI promoverem cursos e workshops sobre investigação de lavagem de dinheiro e rastreamento de ativos.', impact_indicator: 'Aumento da capacidade de identificar e desmantelar redes financeiras criminosas.', result_indicator: 'Número de agentes capacitados em investigação financeira.', deadline: 'Contínuo', responsible: 'MJSP (PF), Coaf, MPI', status: 'Em Execução', indicator_value_current: 50, indicator_unit: 'agentes' },
+            { id: 'action2.2.A', meta_id: 'meta2.2', description: 'Senad/MJSP, AGU e MPI oferecerem treinamento sobre gestão, leilão antecipado e destinação de bens apreendidos.', impact_indicator: 'Otimização da recuperação de ativos e sua aplicação em benefício das TIs.', result_indicator: 'Número de profissionais treinados em gestão de ativos.', deadline: 'Médio Prazo', responsible: 'MJSP (Senad), AGU, MPI', status: 'Prevista', indicator_value_current: null, indicator_unit: '' },
+            { id: 'action2.3.A', meta_id: 'meta2.3', description: 'BCB, CMN, MAPA e MPI desenvolverem módulos de capacitação sobre as normas de crédito rural e fiscalização de agropecuária não autorizada.', impact_indicator: 'Redução do financiamento e da atuação de agropecuária ilegal.', result_indicator: 'Número de agentes capacitados em normas de crédito rural e fiscalização agropecuária.', deadline: 'Curto Prazo', responsible: 'BCB, CMN, MAPA, MPI', status: 'Prevista', indicator_value_current: null, indicator_unit: '' },
+            { id: 'action3.3.A', meta_id: 'meta3.3', description: 'MPI coordenar com MJSP (Saju), ANM, CMN e BCB a implementação e fiscalização do PL do Ouro e das normas de crédito rural em TIs e áreas de influência.', impact_indicator: 'Redução da lavagem de ouro ilegal e do financiamento de atividades agropecuárias ilegais.', result_indicator: '% de conformidade com as novas regras do PL do Ouro e de crédito rural em TIs.', deadline: 'Médio Prazo', responsible: 'MPI, MJSP (Saju), ANM, CMN, BCB', status: 'Prevista', indicator_value_current: null, indicator_unit: '' },
+
+            // Eixo Ambiental e Regulatório
+            { id: 'action1.2.B', meta_id: 'meta1.2', description: 'Censipam, com apoio do MPI, aprimorar o monitoramento por geointeligência para identificar movimentação de produtos ilegais em TIs.', impact_indicator: 'Maior efetividade das operações de fiscalização.', result_indicator: '% de operações de fiscalização direcionadas por geointeligência em TIs.', deadline: 'Contínuo', responsible: 'Censipam, MPI, IBAMA, PF', status: 'Em Execução', indicator_value_current: null, indicator_unit: '' },
+            { id: 'action1.2.A', meta_id: 'meta1.2', description: 'Integrar bases de dados de desmatamento (PRODES/INPE) e embargos ambientais (IBAMA) com sistemas de inteligência financeira.', impact_indicator: 'Aumento da capacidade de verificação proativa.', result_indicator: 'Percentual de dados integrados.', deadline: 'Médio Prazo', responsible: 'MMA, IBAMA, Coaf, PF', status: 'Prevista', indicator_value_current: 0.15, indicator_unit: '%' }
+        ];
+
+        // Indicadores de Resultados (do CSV)
+        const indicadoresResultados = [
+            { "Indicador": "Nº de novas tipologias de LD ambiental em TIs identificadas e disseminadas", "Meta": "Aprimorar a detecção de lavagem de dinheiro de crimes ambientais em TIs", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "MPI,Coaf,IBAMA,Funai", "Fórmula de Cálculo": "Contagem de tipologias validadas e publicadas", "Fonte de Dados": "Relatórios do Coaf, IBAMA e Funai", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "tipologias", "Observações": "" },
+            { "Indicador": "% de integração de bases de dados relevantes para TIs na Rede Recupera", "Meta": "Fortalecer a capacidade de rastreamento de ativos ilícitos", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "MPI,MJSP (PF, Senad),AGU", "Fórmula de Cálculo": "(Número de bases de dados integradas / Total de bases de dados relevantes) * 100", "Fonte de Dados": "Relatórios da Rede Recupera", "Periodicidade": "Semestral", "Tipo de dado": "Percentual", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Nº de manuais e treinamentos jurídicos específicos para TIs realizados", "Meta": "Qualificar o suporte jurídico às ações de estrangulamento financeiro", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "AGU,MPI", "Fórmula de Cálculo": "Contagem de manuais publicados e treinamentos concluídos", "Fonte de Dados": "Registros da AGU e MPI", "Periodicidade": "Trimestral", "Tipo de dado": "Numérico", "Unidade": "manuais/treinamentos", "Observações": "" },
+            { "Indicador": "Nº de agentes capacitados em investigação financeira", "Meta": "Aumentar a expertise em investigação financeira de crimes ambientais", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "MJSP (PF),Coaf,MPI", "Fórmula de Cálculo": "Contagem de participantes com certificação em cursos/workshops", "Fonte de Dados": "Registros de cursos", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "agentes", "Observações": "" },
+            { "Indicador": "Nº de profissionais treinados em gestão de ativos", "Meta": "Qualificar a gestão e destinação de ativos apreendidos", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "MJSP (Senad),AGU,MPI", "Fórmula de Cálculo": "Contagem de profissionais com certificação em treinamentos", "Fonte de Dados": "Registros de treinamentos", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "profissionais", "Observações": "" },
+            { "Indicador": "Nº de agentes capacitados em normas de crédito rural e fiscalização agropecuária", "Meta": "Capacitar equipes para aplicação de normas de crédito rural e fiscalização agropecuária", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "BCB,CMN,MAPA,MPI", "Fórmula de Cálculo": "Contagem de agentes com certificação", "Fonte de Dados": "Registros de cursos", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "agentes", "Observações": "" },
+            { "Indicador": "Nº de reuniões do Comitê Executivo realizadas e planos de trabalho aprovados", "Meta": "Consolidar a coordenação intersetorial para o estrangulamento financeiro", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "MPI,Casa Civil", "Fórmula de Cálculo": "Contagem de reuniões e planos aprovados", "Fonte de Dados": "Atas de reunião", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "reuniões/planos", "Observações": "" },
+            { "Indicador": "Frequência e efetividade das reuniões de coordenação local", "Meta": "Consolidar a coordenação intersetorial para o estrangulamento financeiro", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "Casa Civil,MPI,MJSP,MD,IBAMA,Funai", "Fórmula de Cálculo": "Avaliação qualitativa baseada em relatórios de campo e feedback dos participantes", "Fonte de Dados": "Relatórios da Casa de Governo de Boa Vista", "Periodicidade": "Diário/Semanal", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Nº de ações judiciais de perdimento/reparação iniciadas pela AGU em TIs", "Meta": "Fortalecer a atuação da AGU na recuperação de ativos e reparação de danos", "Eixo": "Mobilização Intersetorial e Governanço", "Responsável": "AGU,MPI", "Fórmula de Cálculo": "Contagem de ações iniciadas", "Fonte de Dados": "Registros da AGU", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "ações", "Observações": "" },
+            { "Indicador": "% de conformidade com as novas regras do PL do Ouro e de crédito rural em TIs", "Meta": "Assegurar a aplicação do PL do Ouro e restrições de crédito rural", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "MPI,MJSP (Saju),ANM,CMN,BCB", "Fórmula de Cálculo": "(Número de transações/operações conformes / Total de transações/operações fiscalizadas) * 100", "Fonte de Dados": "Relatórios da ANM, BCB, CMN", "Periodicidade": "Semestral", "Tipo de dado": "Percentual", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Nº de campanhas realizadas e alcance de público", "Meta": "Aumentar a conscientização sobre o impacto financeiro dos crimes ambientais", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP,MMA,Secom", "Fórmula de Cálculo": "Contagem de campanhas e métricas de alcance (impressões, visualizações)", "Fonte de Dados": "Relatórios da Secom e órgãos envolvidos", "Periodicidade": "Trimestral", "Tipo de dado": "Numérico", "Unidade": "campanhas/alcance", "Observações": "" },
+            { "Indicador": "Frequência e detalhamento dos relatórios de resultados financeiros", "Meta": "Publicizar os resultados das operações de estrangulamento financeiro", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP,AGU,Coaf", "Fórmula de Cálculo": "Avaliação qualitativa da frequência e profundidade dos relatórios", "Fonte de Dados": "Relatórios publicados", "Periodicidade": "Trimestral", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Nº de denúncias recebidas e investigadas", "Meta": "Fortalecer os canais de denúncia de crimes ambientais e financeiros", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP (PF),Funai", "Fórmula de Cálculo": "Contagem de denúncias registradas e investigadas", "Fonte de Dados": "Sistemas de denúncia (ex: Linha Verde IBAMA)", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "denúncias", "Observações": "" }
+        ];
+
+        // Indicadores de Impacto (do CSV)
+        const indicadoresImpactos = [
+            { "Indicador": "Redução da opacidade das transações financeiras ilícitas", "Meta": "Aprimorar a detecção de lavagem de dinheiro de crimes ambientais em TIs", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "COAF,PF,BCB,MPI", "Fórmula de Cálculo": "Análise de relatórios de inteligência financeira e feedback de operações", "Fonte de Dados": "Relatórios do Coaf, PF, BCB, MPI", "Periodicidade": "Contínuo", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Maior precisão na avaliação de riscos financeiros em TIs", "Meta": "Aprimorar a detecção de lavagem de dinheiro de crimes ambientais em TIs", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "COAF,PF,BCB,MPI", "Fórmula de Cálculo": "Análise de relatórios de avaliação de riscos e feedback de operações", "Fonte de Dados": "Relatórios do Coaf, PF, BCB, MPI", "Periodicidade": "Anual", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Aumento da agilidade na identificação e apreensão de bens", "Meta": "Fortalecer a capacidade de rastreamento de ativos ilícitos", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "MJSP (PF, Senad),AGU", "Fórmula de Cálculo": "Redução do tempo médio entre a identificação do ativo e sua apreensão", "Fonte de Dados": "Registros da PF, Senad, AGU", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "dias", "Observações": "" },
+            { "Indicador": "Maior efetividade das operações de fiscalização", "Meta": "Fortalecer a capacidade de rastreamento de ativos ilícitos", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "Censipam,MPI,IBAMA,PF", "Fórmula de Cálculo": "Número de operações bem-sucedidas em relação ao total", "Fonte de Dados": "Relatórios de operações", "Periodicidade": "Trimestral", "Tipo de dado": "Numérico", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Redução de contestações e aumento da efetividade das ações judiciais", "Meta": "Qualificar o suporte jurídico às ações de estrangulamento financeiro", "Eixo": "Apoio Técnico e Inteligência Financeira", "Responsável": "AGU,MPI", "Fórmula de Cálculo": "Taxa de sucesso em ações judiciais e redução do número de recursos", "Fonte de Dados": "Registros da AGU", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Aumento da capacidade de identificar e desmantelar redes financeiras criminosas", "Meta": "Aumentar a expertise em investigação financeira de crimes ambientais", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "MJSP (PF),Coaf,MPI", "Fórmula de Cálculo": "Avaliação da complexidade das redes desmanteladas", "Fonte de Dados": "Relatórios da PF, Coaf", "Periodicidade": "Mensal", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Otimização da recuperação de ativos e sua aplicação em benefício das TIs", "Meta": "Qualificar a gestão e destinação de ativos apreendidos", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "MJSP (Senad),AGU,MPI", "Fórmula de Cálculo": "Percentual de ativos recuperados e revertidos para TIs", "Fonte de Dados": "Relatórios da Senad, AGU, MPI", "Periodicidade": "Trimestral", "Tipo de dado": "Percentual", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Redução do financiamento e da atuação de agropecuária ilegal", "Meta": "Capacitar equipes para aplicação de normas de crédito rural e fiscalização agropecuária", "Eixo": "Capacitação, Formação e Treinamento Permanente", "Responsável": "BCB,CMN,MAPA,MPI", "Fórmula de Cálculo": "Redução do número de financiamentos irregulares e de áreas com agropecuária ilegal", "Fonte de Dados": "Relatórios do BCB, CMN, MAPA, IBAMA", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Maior integração e alinhamento estratégico das ações", "Meta": "Consolidar a coordenação intersetorial para o estrangulamento financeiro", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "MPI,Casa Civil", "Fórmula de Cálculo": "Avaliação qualitativa da coordenação e alinhamento", "Fonte de Dados": "Atas de reunião, feedback", "Periodicidade": "Mensal", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Otimização da execução das operações em campo", "Meta": "Consolidar a coordenação intersetorial para o estrangulamento financeiro", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "Casa Civil,MPI,MJSP,MD,IBAMA,Funai", "Fórmula de Cálculo": "Redução do tempo de resposta e aumento da eficiência das operações", "Fonte de Dados": "Relatórios da Casa de Governo de Boa Vista", "Periodicidade": "Diário/Semanal", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Aumento da efetividade da recuperação de ativos e da responsabilização financeira", "Meta": "Fortalecer a atuação da AGU na recuperação de ativos e reparação de danos", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "AGU,MPI", "Fórmula de Cálculo": "Volume de ativos recuperados e multas cobradas", "Fonte de Dados": "Registros da AGU", "Periodicidade": "Trimestral", "Tipo de dado": "Numérico", "Unidade": "R$", "Observações": "" },
+            { "Indicador": "Redução da lavagem de ouro ilegal e do financiamento de atividades agropecuárias ilegais", "Meta": "Assegurar a aplicação do PL do Ouro e restrições de crédito rural", "Eixo": "Mobilização Intersetorial e Governança", "Responsável": "MPI,MJSP (Saju),ANM,CMN,BCB", "Fórmula de Cálculo": "Redução do volume de ouro ilegal no mercado e de áreas com agropecuária ilegal", "Fonte de Dados": "Relatórios da ANM, BCB, CMN, IBAMA", "Periodicidade": "Semestral", "Tipo de dado": "Numérico", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Maior apoio público às ações de combate e denúncias", "Meta": "Aumentar a conscientização sobre o impacto financeiro dos crimes ambientais", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP,MMA,Secom", "Fórmula de Cálculo": "Pesquisas de opinião pública e análise de engajamento em mídias sociais", "Fonte de Dados": "Pesquisas e relatórios da Secom", "Periodicidade": "Trimestral", "Tipo de dado": "Numérico", "Unidade": "%", "Observações": "" },
+            { "Indicador": "Transparência e prestação de contas à sociedade", "Meta": "Publicizar os resultados das operações de estrangulamento financeiro", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP,AGU,Coaf", "Fórmula de Cálculo": "Avaliação qualitativa da frequência e profundidade dos relatórios", "Fonte de Dados": "Relatórios publicados", "Periodicidade": "Trimestral", "Tipo de dado": "Qualitativo", "Unidade": "N/A", "Observações": "" },
+            { "Indicador": "Aumento do número de denúncias qualificadas", "Meta": "Fortalecer os canais de denúncia de crimes ambientais e financeiros", "Eixo": "Campanhas, Divulgação e Publicização", "Responsável": "MPI,MJSP (PF),Funai", "Fórmula de Cálculo": "Contagem de denúncias registradas e investigadas", "Fonte de Dados": "Sistemas de denúncia (ex: Linha Verde IBAMA)", "Periodicidade": "Mensal", "Tipo de dado": "Numérico", "Unidade": "denúncias", "Observações": "" }
+        ];
+
+        // Combine todos os indicadores e mapeie por órgão responsável
+        const allIndicators = [...indicadoresResultados, ...indicadoresImpactos];
+        const indicatorsByAgency = {};
+
+        allIndicators.forEach(ind => {
+            const responsibles = ind.Responsável.split(',').map(r => r.trim());
+            responsibles.forEach(org => {
+                // Padroniza o nome do órgão para o mapeamento (ex: "MJSP (PF)" -> "MJSP")
+                let orgKey = org.split('(')[0].trim();
+                // Mapeamentos específicos para nomes curtos ou variações
+                if (orgKey === 'Polícia Federal') orgKey = 'MJSP'; // Mapeia PF para MJSP
+                if (orgKey === 'Receita Federal') orgKey = 'MF'; // Mapeia RF para MF
+                if (orgKey === 'IBAMA') orgKey = 'MMA'; // Mapeia IBAMA para MMA (como órgão supervisor)
+                if (orgKey === 'ICMBio') orgKey = 'MMA'; // Mapeia ICMBio para MMA
+                if (orgKey === 'CMN') orgKey = 'MF'; // Mapeia CMN para MF
+                if (orgKey === 'Saju') orgKey = 'MJSP'; // Mapeia Saju para MJSP
+                if (orgKey === 'Senad') orgKey = 'MJSP'; // Mapeia Senad para MJSP
+                if (orgKey === 'Funai') orgKey = 'MPI'; // Mapeia Funai para MPI
+                if (orgKey === 'Censipam') orgKey = 'MD'; // Mapeia Censipam para MD
+                if (orgKey === 'INCRA') orgKey = 'MDA'; // Mapeia INCRA para MDA
+                if (orgKey === 'Secom') orgKey = 'Casa Civil'; // Mapeia Secom para Casa Civil
+                if (orgKey === 'MPF') orgKey = 'MPF'; // MPF é um órgão independente, mantido
+                if (orgKey === 'MD') orgKey = 'MD'; // MD é um órgão independente, mantido
+                if (orgKey === 'MS') orgKey = 'MS'; // MS é um órgão independente, mantido
+                if (orgKey === 'Conab') orgKey = 'MAPA'; // Conab vinculada ao MAPA
+                if (orgKey === 'MPO') orgKey = 'MPO'; // MPO é um órgão independente, mantido
+
+                if (!indicatorsByAgency[orgKey]) {
+                    indicatorsByAgency[orgKey] = [];
+                }
+                indicatorsByAgency[orgKey].push(ind);
+            });
+        });
+
+
+        const statusOptions = ['Em Execução', 'Concluído', 'Pendente', 'Cancelado', 'A Definir'];
+
+        // Função para renderizar as tabelas de ações
+        function renderActionTables() {
+            const container = document.getElementById('action-plan-management');
+            container.innerHTML = ''; // Limpa o conteúdo anterior
+
+            quadrosData.forEach(quadro => {
+                const quadroDiv = document.createElement('div');
+                quadroDiv.className = 'mb-10 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-200';
+                quadroDiv.innerHTML = `
+                    <h3 class="subsection-title text-blue-800 mb-4">${quadro.title}</h3>
+                    <p class="text-gray-600 text-sm mb-4">${quadro.context}</p>
+                `;
+                container.appendChild(quadroDiv);
+
+                quadro.metas.forEach(meta => {
+                    const metaDiv = document.createElement('div');
+                    metaDiv.className = 'mb-6 p-4 bg-white rounded-lg shadow-sm border border-gray-200';
+                    metaDiv.innerHTML = `
+                        <h4 class="text-lg font-medium text-gray-800 mb-3">Meta: ${meta.description}</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ação</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indicador Impacto</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indicador Resultado</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prazo</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsáveis</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Indicador</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    ${actionsData.filter(a => a.meta_id === meta.id).map(action => `
+                                        <tr data-action-id="${action.id}">
+                                            <td class="px-4 py-2 whitespace-normal text-sm text-gray-900 w-1/4" data-field="description">
+                                                ${action.description}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-normal text-sm text-gray-900 w-1/6" data-field="impact_indicator">
+                                                ${action.impact_indicator}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-normal text-sm text-gray-900 w-1/6" data-field="result_indicator">
+                                                ${action.result_indicator}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 w-1/12" data-field="deadline">
+                                                ${action.deadline}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 w-1/12" data-field="responsible">
+                                                ${action.responsible}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 w-1/12" data-field="status">
+                                                ${action.status}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 w-1/12" data-field="indicator_value_current">
+                                                ${action.indicator_value_current !== null ? action.indicator_value_current + ' ' + (action.indicator_unit || '') : 'N/A'}
+                                            </td>
+                                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-medium w-1/12">
+                                                <button onclick="deleteAction('${action.id}')" class="delete-button">Deletar</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="showAddActionForm('${meta.id}')" class="action-button">Adicionar Nova Ação</button>
+                        </div>
+                    </div>
+                `;
+                quadroDiv.appendChild(metaDiv);
+            });
+        });
+
+        // Adiciona listeners para edição inline
+        document.querySelectorAll('td[data-field]').forEach(cell => {
+            cell.addEventListener('click', function() {
+                const actionId = this.closest('tr').dataset.actionId;
+                const field = this.dataset.field;
+                const action = actionsData.find(a => a.id === actionId);
+                const currentValue = action ? action[field] : ''; // Find action to get current value
+
+                if (field === 'status') {
+                    const select = document.createElement('select');
+                    select.className = 'status-select';
+                    statusOptions.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        if (option === currentValue) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    });
+                    select.onchange = (e) => {
+                        updateAction(actionId, field, e.target.value);
+                        renderActionTables(); // Re-render immediately on change
+                    };
+                    select.onblur = renderActionTables; // Re-render on blur if focus lost
+                    this.innerHTML = '';
+                    this.appendChild(select);
+                    select.focus();
+                } else if (field === 'indicator_value_current') {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.step = '0.01';
+                    input.className = 'indicator-input';
+                    input.value = currentValue !== null ? currentValue : '';
+                    input.onchange = (e) => {
+                         const val = e.target.value === '' ? null : parseFloat(e.target.value);
+                         updateAction(actionId, field, val);
+                         // No immediate re-render here, it happens on blur
+                    };
+                    input.onblur = renderActionTables; // Re-render on blur
+                    this.innerHTML = '';
+                    this.appendChild(input);
+                    input.focus();
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'text-input';
+                    input.value = currentValue;
+                    input.onchange = (e) => {
+                        updateAction(actionId, field, e.target.value);
+                        // No immediate re-render here, it happens on blur
+                    };
+                    input.onblur = renderActionTables; // Re-render on blur
+                    this.innerHTML = '';
+                    this.appendChild(input);
+                    input.focus();
+                }
+            });
+        });
+    }
+
+    // Função para atualizar uma ação (simula o PUT do backend)
+    function updateAction(actionId, field, value) {
+        const actionIndex = actionsData.findIndex(a => a.id === actionId);
+        if (actionIndex !== -1) {
+            actionsData[actionIndex][field] = value;
+        }
+        // renderActionTables() é chamado no onBlur ou onChange do select
+    }
+
+    // Função para deletar uma ação (simula o DELETE do backend)
+    function deleteAction(actionId) {
+        if (confirm('Tem certeza que deseja deletar esta ação?')) {
+            actionsData = actionsData.filter(a => a.id !== actionId);
+            renderActionTables(); // Re-renderiza para mostrar a mudança
+        }
+    }
+
+    // Funções para o formulário de Adicionar Nova Ação
+    function showAddActionForm(metaId) {
+        document.getElementById('add-action-form').style.display = 'block';
+        document.getElementById('add-action-meta-id').value = metaId;
+        // Limpar campos do formulário
+        document.getElementById('new-action-description').value = '';
+        document.getElementById('new-action-impact-indicator').value = '';
+        document.getElementById('new-action-result-indicator').value = '';
+        document.getElementById('new-action-deadline').value = '';
+        document.getElementById('new-action-responsible').value = '';
+        document.getElementById('new-action-status').value = 'Pendente';
+        document.getElementById('new-action-indicator-value').value = '';
+        document.getElementById('new-action-indicator-unit').value = '';
+    }
+
+    function cancelAddAction() {
+        document.getElementById('add-action-form').style.display = 'none';
+    }
+
+    function submitAddAction() {
+        const metaId = document.getElementById('add-action-meta-id').value;
+        const description = document.getElementById('new-action-description').value;
+        const impact_indicator = document.getElementById('new-action-impact-indicator').value;
+        const result_indicator = document.getElementById('new-action-result-indicator').value;
+        const deadline = document.getElementById('new-action-deadline').value;
+        const responsible = document.getElementById('new-action-responsible').value;
+        const status = document.getElementById('new-action-status').value;
+        const indicator_value_current_str = document.getElementById('new-action-indicator-value').value;
+        const indicator_unit = document.getElementById('new-action-indicator-unit').value;
+
+        if (!description) {
+            alert('A descrição da ação é obrigatória!');
+            return;
+        }
+
+        const newActionId = 'action' + Math.random().toString(36).substring(2, 9); // Gera um ID simples
+
+        const newAction = {
+            id: newActionId,
+            meta_id: metaId,
+            description: description,
+            impact_indicator: impact_indicator,
+            result_indicator: result_indicator,
+            deadline: deadline,
+            responsible: responsible,
+            status: status,
+            indicator_value_current: indicator_value_current_str === '' ? null : parseFloat(indicator_value_current_str),
+            indicator_unit: indicator_unit
+        };
+
+        actionsData.push(newAction);
+        renderActionTables();
+        cancelAddAction(); // Esconde o formulário
+        alert('Ação adicionada! Lembre-se que esta alteração não será salva.');
+    }
+
+    // Funções para o formulário de Indicadores por Órgão
+    function showIndicatorForm(orgName) {
+        const modal = document.getElementById('indicator-data-form-modal');
+        const orgNameSpan = document.getElementById('current-org-name');
+        const fieldsContainer = document.getElementById('indicator-fields-container');
+        orgNameSpan.textContent = orgName;
+        fieldsContainer.innerHTML = ''; // Clear previous fields
+
+        const indicatorsForOrg = indicatorsByAgency[orgName] || [];
+
+        if (indicatorsForOrg.length === 0) {
+            fieldsContainer.innerHTML = `<p class="form-full-width text-gray-600">Nenhum indicador encontrado para este órgão.</p>`;
+        } else {
+            indicatorsForOrg.forEach((ind, index) => {
+                const fieldId = `indicator-${orgName}-${index}`;
+                let inputElement;
+                if (ind['Tipo de dado'] === 'Numérico' || ind['Tipo de dado'] === 'Percentual') {
+                    inputElement = `<input type="number" step="0.01" id="${fieldId}" class="form-field-input mt-1 block w-full" placeholder="Valor atual">`;
+                } else if (ind['Tipo de dado'] === 'Qualitativo') {
+                    inputElement = `<textarea id="${fieldId}" class="form-field-input mt-1 block w-full" rows="2" placeholder="Detalhes da atualização"></textarea>`;
+                } else {
+                    inputElement = `<input type="text" id="${fieldId}" class="form-field-input mt-1 block w-full" placeholder="Valor">`;
+                }
+
+                fieldsContainer.innerHTML += `
+                    <div>
+                        <label for="${fieldId}" class="block text-sm font-medium text-gray-700">
+                            ${ind.Indicador} (${ind.Unidade}) - Periodicidade: ${ind.Periodicidade}
+                        </label>
+                        ${inputElement}
+                    </div>
+                `;
+            });
+        }
+        modal.style.display = 'block';
+    }
+
+    function hideIndicatorForm() {
+        document.getElementById('indicator-data-form-modal').style.display = 'none';
+    }
+
+    document.getElementById('indicator-report-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        const orgName = document.getElementById('current-org-name').textContent;
+        const formData = {};
+        const indicatorsForOrg = indicatorsByAgency[orgName] || [];
+
+        indicatorsForOrg.forEach((ind, index) => {
+            const fieldId = `indicator-${orgName}-${index}`;
+            const inputElement = document.getElementById(fieldId);
+            if (inputElement) {
+                let value = inputElement.value;
+                if (ind['Tipo de dado'] === 'Numérico' || ind['Tipo de dado'] === 'Percentual') {
+                    value = value === '' ? null : parseFloat(value);
+                }
+                formData[ind.Indicador] = value;
+            }
+        });
+
+        console.log(`Dados submetidos para ${orgName}:`, formData);
+        alert(`Dados de indicadores para ${orgName} submetidos com sucesso (simulado)!`);
+        hideIndicatorForm();
+    });
+
+
+    // Lógica de Login e Logout
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginMessage = document.getElementById('login-message');
+        const loginScreen = document.getElementById('login-screen');
+        const mainContent = document.getElementById('main-content');
+
+        // Initial state: show login screen
+        loginScreen.style.display = 'flex';
+        mainContent.style.display = 'none';
+
+        loginButton.addEventListener('click', () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            // Simulação de login: qualquer usuário/senha funciona
+            if (username && password) {
+                loginScreen.style.display = 'none'; // Esconde a tela de login
+                mainContent.style.display = 'block'; // Mostra o conteúdo principal
+                renderActionTables(); // Renderiza as tabelas após o login
+                showTab('visao-geral'); // Default to first tab
+            } else {
+                loginMessage.textContent = 'Por favor, preencha usuário e senha.';
+                loginMessage.classList.remove('hidden');
+            }
+        });
+
+        logoutButton.addEventListener('click', () => {
+            loginScreen.style.display = 'flex'; // Mostra a tela de login
+            mainContent.style.display = 'none'; // Esconde o conteúdo principal
+            loginMessage.classList.add('hidden'); // Limpa mensagem de erro
+            usernameInput.value = 'mpi_admin'; // Reseta campos
+            passwordInput.value = 'senha123';
+        });
+
+        // Tab navigation logic
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+                showTab(tabId);
+            });
+        });
+    });
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(tabId).classList.add('active');
+
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+    }
+    </script>
+</body>
+</html>
